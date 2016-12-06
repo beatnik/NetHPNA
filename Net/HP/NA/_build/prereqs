@@ -1,0 +1,12 @@
+do{ my $x = {
+       'build_requires' => {},
+       'conflicts' => {},
+       'recommends' => {},
+       'requires' => {
+                       'Module::Build' => '0.42',
+                       'Moose' => '>= 2.0',
+                       'SOAP::Lite' => '1.2'
+                     },
+       'test_requires' => {}
+     };
+$x; }

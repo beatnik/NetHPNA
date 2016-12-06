@@ -1,0 +1,90 @@
+                    <!-- method:show_user can return the following fields
+                        userPassword
+                        timeZone
+                        ticketNumber
+                        aaaPassword
+                        userName
+                        requiredUser
+                        createDate
+                        firstName
+                        distinguishedName
+                        lastName
+                        deviceGroup1ID
+                        useAaaLoginForProxy
+                        userCustom3
+                        lastLoginDate
+                        userPasswordUnhashed
+                        userCustom2
+                        status
+                        deviceGroup2ID
+                        userCustom1
+                        passwordOption
+                        emailAddress
+                        userCustom6
+                        userCustom5
+                        userCustom4
+                        userID
+                        privilegeLevel
+                        lastModifiedDate
+                        deviceGroup3ID
+                        passwordLastModifiedDate
+                        aaaUserName
+                        allowFailover
+                        comments
+                    -->
+                    <!-- method:list_user can return the following fields
+                        userPassword
+                        timeZone
+                        ticketNumber
+                        aaaPassword
+                        userName
+                        requiredUser
+                        createDate
+                        firstName
+                        distinguishedName
+                        lastName
+                        deviceGroup1ID
+                        useAaaLoginForProxy
+                        userCustom3
+                        lastLoginDate
+                        userPasswordUnhashed
+                        userCustom2
+                        status
+                        deviceGroup2ID
+                        userCustom1
+                        passwordOption
+                        emailAddress
+                        userCustom6
+                        userCustom5
+                        userCustom4
+                        userID
+                        privilegeLevel
+                        lastModifiedDate
+                        deviceGroup3ID
+                        passwordLastModifiedDate
+                        aaaUserName
+                        allowFailover
+                        comments
+                    -->
+            <complexType name="mod_userInputParms">
+                <sequence>
+                    <element name="sessionid" type="xsd:string" />
+                    <element name="u" type="xsd:string" />
+                    <element name="ln" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="useaaaloginforproxy" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="status" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="view1partition" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="customvalues" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="view3partition" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="extauthfailover" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="email" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="aaausername" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="customname" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="priv" type="xsd:int" minOccurs="0" nillable="true" />
+                    <element name="customvalue" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="customnames" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="fn" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="view2partition" type="xsd:string" minOccurs="0" nillable="true" />
+                    <element name="newusername" type="xsd:string" minOccurs="0" nillable="true" />
+                </sequence>
+
