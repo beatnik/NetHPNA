@@ -211,7 +211,7 @@ has 'userPasswordUnhashed' => (
 
 =head1 NAME
 
-Net::HP::NA::User - Access Cisco HP Network Automation functionality through SOAP API - User fields
+Net::HP::NA::User - Access HP Network Automation functionality through SOAP API - User fields
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ Net::HP::NA::User - Access Cisco HP Network Automation functionality through SOA
 	
 =head1 DESCRIPTION
 
-The Net::HP::NA::User class holds all the user relevant information from Cisco HP Network Automation 5.x
+The Net::HP::NA::User class holds all the user relevant information from HP Network Automation 9.x / 10.x
 
 =head1 USAGE
 
@@ -290,7 +290,7 @@ Class constructor. Returns object of Net::HP::NA::User on succes. The following 
 
 =item id
 
-Formatting rules may be in place & enforced by Cisco HP Network Automation.
+Formatting rules may be in place & enforced by HP Network Automation.
 
 =back
 
@@ -358,7 +358,7 @@ Boolean flag to activate the automatic deactivation feature based on expiration 
 
 =item id
 
-Cisco HP Network Automation generates a unique ID for each User record. This field cannot be updated within HP Network Automation but is used for reference. Set to 0 when creating a new record or when duplicating an existing user.
+HP Network Automation generates a unique ID for each User record. This field cannot be updated within HP Network Automation but is used for reference. Set to 0 when creating a new record or when duplicating an existing user.
 
 =item toXML
 
