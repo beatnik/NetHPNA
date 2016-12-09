@@ -4,212 +4,267 @@ use Moose;
 
 BEGIN {
     use Exporter ();
-    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %actions);
+    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @fields);
     $VERSION     = '0.01';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
     %EXPORT_TAGS = ();
+	@fields 	 = qw(userPassword
+                        timeZone
+                        ticketNumber
+                        aaaPassword
+                        userName
+                        requiredUser
+                        createDate
+                        firstName
+                        distinguishedName
+                        lastName
+                        deviceGroup1ID
+                        useAaaLoginForProxy
+                        userCustom3
+                        lastLoginDate
+                        userPasswordUnhashed
+                        userCustom2
+                        status
+                        deviceGroup2ID
+                        userCustom1
+                        passwordOption
+                        emailAddress
+                        userCustom6
+                        userCustom5
+                        userCustom4
+                        userID
+                        privilegeLevel
+                        lastModifiedDate
+                        deviceGroup3ID
+                        passwordLastModifiedDate
+                        aaaUserName
+                        allowFailover
+                        comments
+					);
 };
-
-    %actions = (	"query" => "/Rest/Identity/User",
-					"create" => "/Rest/Identity/User",
-               		"update" => "/Rest/Identity/User",
-                	"getByName" => "/Rest/Identity/User/name/",
-                	"getById" => "/Rest/Identity/User/id/",
-           ); 
 
 # MOOSE!
 		   
-has 'description' => (
-      is  => 'rw',
-      isa => 'Any',
-  );
+has 'aaaPassword' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'id' => (
-      is  => 'rw',
-      isa => 'Str',
-  );
+has 'aaaUserName' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'identityGroupName' => ( 
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'allowFailover' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'name' => (
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'comments' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'dateExceeds' => ( 
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'createDate' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'changePassword' => ( 
-	is => 'ro',
-	isa => 'Str',
-	);
+has 'deviceGroup1ID' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'created' => ( 
-	is => 'ro',
-	isa => 'Str',
-	);
+has 'deviceGroup2ID' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'attributeInfo' => ( 
-	is => 'ro',
-	isa => 'ArrayRef',
-	auto_deref => '1',
-	);		
+has 'deviceGroup3ID' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'dateExceedsEnabled' => (
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'distinguishedName' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'enablePassword' => (
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'emailAddress' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'enabled' => (
-	is => 'rw', 
-	isa => 'Str',
-	);
+has 'firstName' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'lastLogin' => (
-	is => 'ro',
-	isa => 'Any',
-	);
+has 'lastLoginDate' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'lastModified' => (
-	is => 'ro',
-	isa => 'Str',
-	);
+has 'lastModifiedDate' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'lastPasswordChange' => ( 
-	is => 'ro',
-	isa => 'Str',
-	);
+has 'lastName' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'loginFailuresCounter' => (
-	is => 'ro',
-	isa => 'Int',
-	);
+has 'passwordLastModifiedDate' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'password' => (
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'passwordOption' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'passwordNeverExpires' => (
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'privilegeLevel' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
-has 'passwordType' => (
-	is => 'rw',
-	isa => 'Str',
-	);
+has 'requiredUser' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'status' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'ticketNumber' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'timeZone' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'useAaaLoginForProxy' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userCustom1' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userCustom2' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userCustom3' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userCustom4' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userCustom5' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userCustom6' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userID' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userName' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userPassword' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'userPasswordUnhashed' => (
+        is => 'rw',
+        isa => 'Str',
+        );
 
 # No Moose	
-	
-sub toXML
-{ my $self = shift;
-  my $id = $self->id;
-  my $description = $self->description || ""; 
-  my $identitygroupname = $self->identityGroupName || "All Groups";
-  my $name = $self->name || "";
-  my $changepassword = $self->changePassword || "false";
-  my $enabled = $self->enabled || "true";
-  my $password = $self->password || "";
-  my $passwordneverexpires = $self->passwordNeverExpires || "false";
-  my $passwordtype = $self->passwordType || "Internal Users";
-  my $enablepassword = $self->enablePassword || "";
-  my $dateexceeds = $self->dateExceeds || "";
-  my $dateexceedsenabled = $self->dateExceedsEnabled || "false";
-  my $result = "";
-  
-  if ($id) { $result = "   <id>$id</id>\n"; }
-  $result .= <<XML;
-   <description>$description</description>
-   <identityGroupName>$identitygroupname</identityGroupName>
-   <name>$name</name>
-   <changePassword>$changepassword</changePassword>
-   <enablePassword>$enablepassword</enablePassword>
-   <enabled>$enabled</enabled>
-   <password>$password</password>
-   <passwordNeverExpires>$passwordneverexpires</passwordNeverExpires>
-   <passwordType>$passwordtype</passwordType>
-   <dateExceeds>$dateexceeds</dateExceeds>
-   <dateExceedsEnabled>$dateexceedsenabled</dateExceedsEnabled>
-XML
 
-return $result;
-}
-
-sub header
-{ my $self = shift;
-  my $users = shift;
-  return qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:user xmlns:ns2="identity.rest.mgmt.acs.nm.cisco.com">$users</ns2:user>};
-}
-	
 =head1 NAME
 
-Net::Cisco::ACS::User - Access Cisco ACS functionality through REST API - User fields
+Net::HP::NA::User - Access Cisco HP Network Automation functionality through SOAP API - User fields
 
 =head1 SYNOPSIS
 
-	use Net::Cisco::ACS;
-	use Net::Cisco::ACS::User;
+	use Net::HP::NA;
+	use Net::HP::NA::User;
   
-	my $acs = Net::Cisco::ACS->new(hostname => '10.0.0.1', username => 'acsadmin', password => 'testPassword');
-	my $user = Net::Cisco::ACS::User->new("name"=>"soloh","description"=>"Han Solo","identityGroupName"=>"All Groups:MilleniumCrew","password"=>"Leia");
+	my $na = Net::HP::NA->new(hostname => '10.0.0.1', username => 'admin', password => 'testPassword');
+	my $user = Net::HP::NA::User->new("name"=>"soloh","description"=>"Han Solo","identityGroupName"=>"All Groups:MilleniumCrew","password"=>"Leia");
 
-	my %users = $acs->users;
-	# Retrieve all users from ACS
-	# Returns hash with username / Net::Cisco::ACS::User pairs
+	my %users = $na->users;
+	# Retrieve all users from HP Network Automation
+	# Returns hash with username / Net::HP::NA::User pairs
 	
-	print $acs->users->{"acsadmin"}->toXML;
-	# Dump in XML format (used by ACS for API calls)
+	print $na->users->{"HP Network Automationadmin"}->toXML;
+	# Dump in XML format (used by HP Network Automation for API calls)
 	
-	my $user = $acs->users("name","acsadmin");
+	my $user = $na->users("name","HP Network Automationadmin");
 	# Faster call to request specific user information by name
 
-	my $user = $acs->users("id","150");
-	# Faster call to request specific user information by ID (assigned by ACS, present in Net::Cisco::ACS::User)
+	my $user = $na->users("id","150");
+	# Faster call to request specific user information by ID (assigned by HP Network Automation, present in Net::HP::NA::User)
 
 	$user->id(0); # Required for new user!
-	my $id = $acs->create($user);
-	# Create new user based on Net::Cisco::ACS::User instance
-	# Return value is ID generated by ACS
+	my $id = $na->create($user);
+	# Create new user based on Net::HP::NA::User instance
+	# Return value is ID generated by HP Network Automation
 	print "Record ID is $id" if $id;
-	print $Net::Cisco::ACS::ERROR unless $id;
-	# $Net::Cisco::ACS::ERROR contains details about failure
+	print $Net::HP::NA::ERROR unless $id;
+	# $Net::HP::NA::ERROR contains details about failure
 
-	my $id = $acs->update($user);
-	# Update existing user based on Net::Cisco::ACS::User instance
-	# Return value is ID generated by ACS
+	my $id = $na->update($user);
+	# Update existing user based on Net::HP::NA::User instance
+	# Return value is ID generated by HP Network Automation
 	print "Record ID is $id" if $id;
-	print $Net::Cisco::ACS::ERROR unless $id;
-	# $Net::Cisco::ACS::ERROR contains details about failure
+	print $Net::HP::NA::ERROR unless $id;
+	# $Net::HP::NA::ERROR contains details about failure
 
-	$acs->delete($user);
-	# Delete existing user based on Net::Cisco::ACS::User instance
+	$na->delete($user);
+	# Delete existing user based on Net::HP::NA::User instance
 	
 =head1 DESCRIPTION
 
-The Net::Cisco::ACS::User class holds all the user relevant information from Cisco ACS 5.x
+The Net::HP::NA::User class holds all the user relevant information from Cisco HP Network Automation 5.x
 
 =head1 USAGE
 
-All calls are typically handled through an instance of the L<Net::Cisco::ACS> class. L<Net::Cisco::ACS::User> acts as a container for user related information.
+All calls are typically handled through an instance of the L<Net::HP::NA> class. L<Net::HP::NA::User> acts as a container for user related information.
 
 =over 3
 
 =item new
 
-Class constructor. Returns object of Net::Cisco::ACS::User on succes. The following fields can be set / retrieved:
+Class constructor. Returns object of Net::HP::NA::User on succes. The following fields can be set / retrieved:
 
 =over 5
 
@@ -235,7 +290,7 @@ Class constructor. Returns object of Net::Cisco::ACS::User on succes. The follow
 
 =item id
 
-Formatting rules may be in place & enforced by Cisco ACS.
+Formatting rules may be in place & enforced by Cisco HP Network Automation.
 
 =back
 
@@ -271,7 +326,7 @@ The user account name. This is a required value in the constructor but can be re
 
 =item identityGroupName
 
-The user group name. This is a required value in the constructor but can be redefined afterwards. See L<Net::Cisco::ACS::IdentityGroupName>.
+The user group name. This is a required value in the constructor but can be redefined afterwards. See L<Net::HP::NA::IdentityGroupName>.
 
 =item enablePassword
 
@@ -303,11 +358,11 @@ Boolean flag to activate the automatic deactivation feature based on expiration 
 
 =item id
 
-Cisco ACS generates a unique ID for each User record. This field cannot be updated within ACS but is used for reference. Set to 0 when creating a new record or when duplicating an existing user.
+Cisco HP Network Automation generates a unique ID for each User record. This field cannot be updated within HP Network Automation but is used for reference. Set to 0 when creating a new record or when duplicating an existing user.
 
 =item toXML
 
-Dump the record in ACS accept XML formatting (without header).
+Dump the record in HP Network Automation accept XML formatting (without header).
 
 =item header
 
