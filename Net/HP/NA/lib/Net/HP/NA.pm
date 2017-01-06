@@ -55,23 +55,22 @@ has 'session' => (
 	);    
     
 sub users # No Moose here :(
-{	my $self = shift;
-    $ERROR = "";
-	if (@_)
-	{ my %args = @_; 
-	  $self->{"Users"} = $args{"users"};
-      if ($self->mock())
-      { return $self->{"Users"}; }
-      
-	  #if ($args{"name"})
-	  #{ $self->{"Users"} = $self->query("User","name",$args{"name"}); }
-	  #if ($args{"id"})
-	  #{ $self->{"Users"} = $self->query("User","id",$args{"id"}); }
-	} else
-	{ $self->{"Users"} = $self->query("User") unless $self->mock();
-	}
-	return $self->{"Users"};
-}	
+{  my $self = shift;
+   $ERROR = "";
+   if (@_)
+   { my %args = @_; 
+     $self->{"Users"} = $args{"users"};
+     if ($self->mock())
+     { return $self->{"Users"}; }
+     #if ($args{"name"})
+     #{ $self->{"Users"} = $self->query("User","name",$args{"name"}); }
+     #if ($args{"id"})
+     #{ $self->{"Users"} = $self->query("User","id",$args{"id"}); }
+     } else
+     { $self->{"Users"} = $self->query("User");
+   }
+   return $self->{"Users"};
+}
 	
 has 'username' => (
 	is => 'rw',
@@ -99,24 +98,22 @@ sub query
    SOAP::Data->name('username')->value($self->username),
    SOAP::Data->name('password')->value($self->password)
   );
-  $self->session($som->{'_content'}[2][1][2][0][2][1][2]); # This needs to be optimized
+  $self->session($som->valueof('//Result/Text'));
   my %data = ();
   if ($type eq "User")
   { my $som = $soap->call('list_user', SOAP::Data->name('sessionid')->value($self->session));
-    my $rows = $som->{'_content'}[2][1][2][0][2][1][2]; # This needs to be optimized
-    for my $r (@{$rows})
-    { pop(@{$r});
-      pop(@{$r});
-      my $ref = pop(@{$r});
-	  my %user = ();
-	  for my $field (@Net::HP::NA::User::fields)
-	  { $user{$field} = $ref->{$field}; }
-	  my $user = Net::HP::NA::User->new(%user);
-	  $data{$ref->{"userName"}} = $user;
-	}
+    my $rows = $som->valueof('//Result/ResultSet');
+    for my $row (@{$rows})
+    { my %user = ();
+      for my $field (@Net::HP::NA::User::fields) 
+      { $user{$field} = $row->{$field}; } 
+      my $user = Net::HP::NA::User->new(%user); 
+      $data{$row->{"userName"}} = $user; 
+    }
+    my $status = $som->valueof('//Result/Status');
   }
   $ERROR = $som->faultstring if ($som->fault);
-  return %data;
+  return \%data;
 }
 
 sub create 
@@ -137,25 +134,24 @@ sub create
   { $type = "User";
   }
   
-  $self->session($som->{'_content'}[2][1][2][0][2][1][2]); # This needs to be optimized
-  my %data = ();
+  $self->session($som->valueof('//Result/Text'));
   if ($type eq "User")
   { for my $entry (@entries)
     { my $som = $soap->call('add_user',
 	  SOAP::Data->name('sessionid')->value($self->session),
-      SOAP::Data->name('u')->value($entry->userName),
+          SOAP::Data->name('u')->value($entry->userName),
 	  SOAP::Data->name('p')->value($entry->userPassword), # THIS PARAMETER IS UNDOCUMENTED!!!!
 	  #SOAP::Data->name('extauthfailover')->value('true'),
 	  SOAP::Data->name('ln')->value($entry->lastName),
 	  SOAP::Data->name('fn')->value($entry->firstName),
 	  SOAP::Data->name('useaaaloginforproxy')->value($entry->useAaaLoginForProxy),
 	  SOAP::Data->name('email')->value($entry->emailAddress),
-	  SOAP::Data->name('aaausername')->value($self->aaaUserName),
+	  SOAP::Data->name('aaausername')->value($entry->aaaUserName),
       );
     }
   }
+  print Dumper $som;
   $ERROR = $som->faultstring if ($som->fault);
-  return %data;
 }
 
 sub update 
@@ -181,18 +177,16 @@ sub delete
   { $type = "User";
   }
 
-  $self->session($som->{'_content'}[2][1][2][0][2][1][2]); # This needs to be optimized
-  my %data = ();
+  $self->session($som->valueof('//Result/Text'));
   if ($type eq "User")
   { for my $entry (@entries)
-    { my $som = $soap->call('delete_user',
-	  SOAP::Data->name('sessionid')->value($self->session),
-      SOAP::Data->name('u')->value($entry->userName),
+    { my $som = $soap->call('del_user',
+           SOAP::Data->name('sessionid')->value($self->session),
+           SOAP::Data->name('u')->value($entry->userName),
       );
     }
   }
   $ERROR = $som->faultstring if ($som->fault);
-  return %data;
 }
 
 =head1 NAME
