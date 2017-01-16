@@ -6,22 +6,23 @@
 
 use lib qw(../lib);
 use Net::HP::NA;
-use Net::HP::NA::User;
+use Net::HP::NA::Device;
 use strict;
 use Data::Dumper;
+
+# Replace code!!
 
 my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
 "password" => 'Secret');
 my $user = Net::HP::NA::User->new();
-$user->userName("user4");
+$user->userName("user3");
 $user->userPassword("Secret");
 $user->allowFailover("true");
 $user->lastName("Last Name");
 $user->firstName("Bob");
 $user->useAaaLoginForProxy("false");
 $user->emailAddress('Pink@fluffyunicorn.rainbow');
-$user->aaaUserName("user4");
+$user->aaaUserName("user3");
 $na->create($user);
-print $Net::HP::NA::ERROR;
-$na->users;
+print Dumper $na->users;

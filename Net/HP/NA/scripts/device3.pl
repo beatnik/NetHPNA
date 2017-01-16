@@ -2,9 +2,11 @@
 
 use lib qw(../lib);
 use Net::HP::NA;
-use Net::HP::NA::User;
+use Net::HP::NA::Device;
 use strict;
 use Data::Dumper;
+
+# Replace code!!
 
 my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',

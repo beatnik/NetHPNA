@@ -2,9 +2,58 @@ package Net::HP::NA::User;
 use strict;
 use Moose;
 
+# HP did a bad job at documenting these..
+
+# list_groups type = user
+#  '__m_users' => '',
+#  'userGroupCustom3' => '',
+#  'comments' => '',
+#  '__m_userCount' => '7',
+#  'userGroupCustom1' => '',
+#  'required' => '1',
+#  'distinguishedName' => '',
+#  'createDate' => '2016-01-03 20:58:46.123',
+#  'userGroupName' => 'View All Partitions',
+#  'userGroupID' => '6',
+#  'userGroupCustom2' => '',
+#  'deviceGroup2ID' => '',
+#  'deviceGroup3ID' => '',
+#  'description' => 'Users in this group have View All permission',
+#  'deviceGroup1ID' => '',
+#  'userGroupCustom4' => '',
+#  'userGroupCustom6' => '',
+#  'lastModifiedDate' => '2016-01-03 20:58:46.123',
+#  'userGroupCustom5' => ''
+
+# del_user_from_group g = groupname u = username
+# add_user_to_group  g = groupname u = username
+# mod_user_group
+
+# show_user_group name = Full Access User
+#  '__m_users' => '[201, 411]',
+#  'userGroupCustom3' => '',
+#  'comments' => '',
+#  '__m_userCount' => '2',
+#  'userGroupCustom1' => '',
+#  'required' => '1',
+#  'distinguishedName' => '',
+#  'createDate' => '2016-01-03 20:58:46.123',
+#  'userGroupName' => 'Full Access User',
+#  'userGroupID' => '2',
+#  'userGroupCustom2' => '',
+#  'deviceGroup2ID' => '',
+#  'deviceGroup3ID' => '',
+#  'description' => 'Full access user',
+#  'deviceGroup1ID' => '',
+#  'userGroupCustom4' => '',
+#  'userGroupCustom6' => '',
+#  'lastModifiedDate' => '2016-01-03 20:58:46.123',
+#  'userGroupCustom5' => ''
+
+
 BEGIN {
     use Exporter ();
-    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @fields);
+    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @fields %createfields %updatefields);
     $VERSION     = '0.01';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
@@ -43,6 +92,36 @@ BEGIN {
                         allowFailover
                         comments
 					);
+					
+	%createfields = 	('u' => 'userName',
+						'p' => 'userPassword',
+						'ln' => 'lastName',
+						'fn' => 'firstName',
+						'useaaaloginforproxy' => 'useAaaLoginForProxy',
+						'email' => 'emailAddress',
+						'aaausername' => 'aaaUserName',
+						'extauthfailover' => 'extAuthFailover',
+						);
+  
+	%updatefields = 	('u' => 'userName',
+						'p' => 'userPassword',
+						'ln' => 'lastName',
+						'fn' => 'firstName',
+						'extauthfailover' => 'extAuthFailover',
+						'useaaaloginforproxy' => 'useAaaLoginForProxy',
+						'email' => 'emailAddress',
+						'aaausername' => 'aaaUserName',
+						'status' => 'status',
+						'priv' => 'privilegeLevel',
+						'newusername' => 'newUserName',						
+						);
+          # Not added
+          # customname
+          # customnames
+          # customvalues
+          # view1partition
+          # view2partition
+          # view3partition
 };
 
 # MOOSE!
@@ -207,6 +286,16 @@ has 'userPasswordUnhashed' => (
         isa => 'Str',
         );
 
+has 'extAuthFailover' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+
+has 'newUserName' => (
+        is => 'rw',
+        isa => 'Str',
+        );
+		
 # No Moose	
 
 =head1 NAME

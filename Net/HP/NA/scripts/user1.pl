@@ -8,4 +8,5 @@ use Data::Dumper;
 my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
 "password" => 'Secret');
-print Dumper $na->users;
+Dumper $na->users;
+print $Net::HP::NA::ERROR;

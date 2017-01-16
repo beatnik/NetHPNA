@@ -10,6 +10,7 @@ use Data::Dumper;
 
 # Net::HP::NA::*
 use Net::HP::NA::User;
+use Net::HP::NA::Device;
 
 BEGIN {
     use Exporter ();
@@ -49,6 +50,12 @@ has 'mock' => (
 	default => '0',
 	);    
 
+has 'default_ns' => (
+	is => 'rw',
+	isa => 'Str',
+	default => 'urn:http://hp.com/nas/10/g'
+);
+	
 has 'session' => (
 	is => 'rw',
 	isa => 'Str',
@@ -66,10 +73,49 @@ sub users # No Moose here :(
      #{ $self->{"Users"} = $self->query("User","name",$args{"name"}); }
      #if ($args{"id"})
      #{ $self->{"Users"} = $self->query("User","id",$args{"id"}); }
-     } else
-     { $self->{"Users"} = $self->query("User");
+   } else
+   { my @fields = @Net::HP::NA::User::fields;
+     my %rows = % { $self->query("User") };
+	 print Dumper \%rows;
+	 my %data = ();
+     for my $row (keys %rows)
+     { my %single = ();
+       for my $field (@fields) 
+       { $single{$field} = $rows{$row}->{$field}; } 
+       my $single = Net::HP::NA::User->new(%single); 
+       $data{$rows{$row}->{"userName"}} = $single; 
+     }
+     $self->{"Users"} = \%data;
    }
    return $self->{"Users"};
+}
+
+sub devices # No Moose here :(
+{  my $self = shift;
+   $ERROR = "";
+   if (@_)
+   { my %args = @_; 
+     $self->{"Devices"} = $args{"devices"};
+     if ($self->mock())
+     { return $self->{"Devices"}; }
+     #if ($args{"name"})
+     #{ $self->{"Devices"} = $self->query("Device","name",$args{"name"}); }
+     #if ($args{"id"})
+     #{ $self->{"Devices"} = $self->query("Device","id",$args{"id"}); }
+     } else
+   { my @fields = @Net::HP::NA::Device::fields;
+     my %rows = % { $self->query("Device") };
+	 my %data = ();
+     for my $row (keys %rows)
+     { my %single = ();
+       for my $field (@fields) 
+       { $single{$field} = $rows{$row}->{$field}; } 
+       my $single = Net::HP::NA::Device->new(%single); 
+       $data{$rows{$row}->{"hostName"}} = $single; 
+     }
+     $self->{"Devices"} = \%data;
+   }
+   return $self->{"Devices"};
 }
 	
 has 'username' => (
@@ -87,29 +133,44 @@ has 'password' => (
 # Non-Moose
 
 sub query 
-{ my ($self, $type, $key, $value) = @_;
+{ my ($self, $type, $method, $key, %params) = @_;
   my $hostname = $self->hostname;
   if ($self->ssl)
   { $hostname = "https://$hostname"; } else
   { $hostname = "http://$hostname"; }
   my $soap = SOAP::Lite->new( proxy => "$hostname/soap");
-  $soap->default_ns('urn:http://hp.com/nas/10/g');
+  $soap->default_ns($self->default_ns);
   my $som = $soap->call('login',
    SOAP::Data->name('username')->value($self->username),
    SOAP::Data->name('password')->value($self->password)
   );
+
   $self->session($som->valueof('//Result/Text'));
   my %data = ();
+
   if ($type eq "User")
-  { my $som = $soap->call('list_user', SOAP::Data->name('sessionid')->value($self->session));
+  { $type = "Generic";
+    $method = "list_user";
+	$key = "userName";
+  }
+
+  if ($type eq "Device")
+  { $type = "Generic";
+    $method = "list_device";
+	$key = "hostName";
+  }
+
+  if ($type eq "Generic")
+  { my @data = (SOAP::Data->name('sessionid')->value($self->session));
+    for my $key (keys %params)
+	{ my $value = $params{$key};
+	  push(@data, SOAP::Data->name($key)->value($value)); 
+	}
+    my $som = $soap->call($method, @data);
     my $rows = $som->valueof('//Result/ResultSet');
     for my $row (@{$rows})
-    { my %user = ();
-      for my $field (@Net::HP::NA::User::fields) 
-      { $user{$field} = $row->{$field}; } 
-      my $user = Net::HP::NA::User->new(%user); 
-      $data{$row->{"userName"}} = $user; 
-    }
+    { $data{$row->{$key}} = $row; 
+	}
     my $status = $som->valueof('//Result/Status');
   }
   $ERROR = $som->faultstring if ($som->fault);
@@ -125,37 +186,74 @@ sub create
   { $hostname = "https://$hostname"; } else
   { $hostname = "http://$hostname"; }
   my $soap = SOAP::Lite->new( proxy => "$hostname/soap");
-  $soap->default_ns('urn:http://hp.com/nas/10/g');
+  $soap->default_ns($self->default_ns);
   my $som = $soap->call('login',
    SOAP::Data->name('username')->value($self->username),
    SOAP::Data->name('password')->value($self->password)
   );
+  $self->session($som->valueof('//Result/Text'));
   if (ref($first) eq "Net::HP::NA::User")
-  { $type = "User";
+  { for my $entry (@entries)
+    { my @data = (SOAP::Data->name('sessionid')->value($self->session));
+	  for my $key (keys %Net::HP::NA::User::createfields)
+	  { my $value = $entry->meta->get_attribute($Net::HP::NA::User::createfields{$key})->get_value($entry);
+	    push(@data, SOAP::Data->name($key)->value($value)); 
+	  }
+	  $som = $soap->call('add_user', @data);
+	}
+	$ERROR = $som->faultstring if ($som->fault);
   }
   
-  $self->session($som->valueof('//Result/Text'));
-  if ($type eq "User")
+  if (ref($first) eq "Net::HP::NA::Device")
   { for my $entry (@entries)
-    { my $som = $soap->call('add_user',
-	  SOAP::Data->name('sessionid')->value($self->session),
-          SOAP::Data->name('u')->value($entry->userName),
-	  SOAP::Data->name('p')->value($entry->userPassword), # THIS PARAMETER IS UNDOCUMENTED!!!!
-	  #SOAP::Data->name('extauthfailover')->value('true'),
-	  SOAP::Data->name('ln')->value($entry->lastName),
-	  SOAP::Data->name('fn')->value($entry->firstName),
-	  SOAP::Data->name('useaaaloginforproxy')->value($entry->useAaaLoginForProxy),
-	  SOAP::Data->name('email')->value($entry->emailAddress),
-	  SOAP::Data->name('aaausername')->value($entry->aaaUserName),
-      );
-    }
+    { my @data = (SOAP::Data->name('sessionid')->value($self->session));
+	  for my $key (keys %Net::HP::NA::Device::updatefields)
+	  { my $value = $entry->meta->get_attribute($Net::HP::NA::Device::updatefields{$key})->get_value($entry);
+	    push(@data, SOAP::Data->name($key)->value($value)); 
+	  }
+	  $som = $soap->call('add_device', @data);
+	}
+	$ERROR = $som->faultstring if ($som->fault);
   }
-  print Dumper $som;
   $ERROR = $som->faultstring if ($som->fault);
 }
 
 sub update 
-{ 
+{ my ($self, @entries) = @_;
+  my $hostname = $self->hostname;
+  my $type;
+  my $first = $entries[0];
+  if ($self->ssl)
+  { $hostname = "https://$hostname"; } else
+  { $hostname = "http://$hostname"; }
+  my $soap = SOAP::Lite->new( proxy => "$hostname/soap");
+  $soap->default_ns($self->default_ns);
+  my $som = $soap->call('login',
+   SOAP::Data->name('username')->value($self->username),
+   SOAP::Data->name('password')->value($self->password)
+  );
+  $self->session($som->valueof('//Result/Text'));
+  if (ref($first) eq "Net::HP::NA::User")
+  { for my $entry (@entries)
+    { my @data = (SOAP::Data->name('sessionid')->value($self->session));
+	  for my $key (keys %Net::HP::NA::User::updatefields)
+	  { my $value = $entry->meta->get_attribute($Net::HP::NA::User::updatefields{$key})->get_value($entry);
+	    push(@data, SOAP::Data->name($key)->value($value)); 
+	  }
+	  $som = $soap->call('mod_user', @data);
+	}
+  }  
+  if (ref($first) eq "Net::HP::NA::Device")
+  { for my $entry (@entries)
+    { my @data = (SOAP::Data->name('sessionid')->value($self->session));
+	  for my $key (keys %Net::HP::NA::Device::updatefields)
+	  { my $value = $entry->meta->get_attribute($Net::HP::NA::Device::updatefields{$key})->get_value($entry);
+	    push(@data, SOAP::Data->name($key)->value($value)); 
+	  }
+	  $som = $soap->call('mod_device', @data);
+	}
+  }  
+  $ERROR = $som->faultstring if ($som->fault);
 }
 
 sub delete 
@@ -168,17 +266,13 @@ sub delete
   { $hostname = "https://$hostname"; } else
   { $hostname = "http://$hostname"; }
   my $soap = SOAP::Lite->new( proxy => "$hostname/soap");
-  $soap->default_ns('urn:http://hp.com/nas/10/g');
+  $soap->default_ns($self->default_ns);
   my $som = $soap->call('login',
    SOAP::Data->name('username')->value($self->username),
    SOAP::Data->name('password')->value($self->password)
   );
-  if (ref($first) eq "Net::HP::NA::User")
-  { $type = "User";
-  }
-
   $self->session($som->valueof('//Result/Text'));
-  if ($type eq "User")
+  if (ref($first) eq "Net::HP::NA::User")
   { for my $entry (@entries)
     { my $som = $soap->call('del_user',
            SOAP::Data->name('sessionid')->value($self->session),
@@ -186,7 +280,17 @@ sub delete
       );
     }
   }
+  if (ref($first) eq "Net::HP::NA::Device")
+  { for my $entry (@entries)
+    { my $som = $soap->call('del_device',
+           SOAP::Data->name('sessionid')->value($self->session),
+           SOAP::Data->name('u')->value($entry->hName),
+      );
+    }
+  }
+ 
   $ERROR = $som->faultstring if ($som->fault);
+ 
 }
 
 =head1 NAME
