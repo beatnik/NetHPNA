@@ -12,15 +12,21 @@ use Data::Dumper;
 
 my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
-"password" => 'Secret');
+"password" => 'password');
 my $user = Net::HP::NA::User->new();
-$user->userName("user3");
+$user->userName("foo_user");
 $user->userPassword("Secret");
 $user->allowFailover("true");
 $user->lastName("Changed Last Name");
-$user->firstName("Changed Bob");
+$user->firstName("Changed First Name");
 $user->useAaaLoginForProxy("false");
-$user->emailAddress('Pinkie@thebra.in');
-$user->aaaUserName("user3");
+$user->emailAddress('foo@bar.bar');
+$user->aaaUserName("falkm_auto");
 $na->update($user);
-print Dumper $na->users;
+my $user_ref = $na->query("userName" => "foo_user", "type" => "Net::HP::NA::User");
+print Dumper $user_ref;
+# Alternatively: 
+# This will only work if you trigger a query or explicitly call $user->na($na);
+# $user->na($na);
+# $user->update; 
+

@@ -1,5 +1,5 @@
 ---
-abstract: 'Access Cisco ACS functionality through REST API'
+abstract: 'Access HP Network Automation functionality through SOAP API'
 author:
   - hendrik.vanbelleghem@gmail.com
 build_requires: {}
@@ -11,17 +11,17 @@ meta-spec:
   version: '1.4'
 name: Net-HP-NA
 provides:
-  Net::Cisco::ACS:
+  Net::HP::NA:
     file: lib/Net/HP/NA.pm
-    version: '0.03'
-  Net::Cisco::ACS::User:
+    version: '0.01'
+  Net::HP::NA::User:
     file: lib/Net/HP/NA/User.pm
-    version: '0.03'
+    version: '0.01'
 requires:
   Module::Build: '0.42'
   Moose: '2.0'
   SOAP::Lite: '1.2'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
-version: '0'
+version: '0.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

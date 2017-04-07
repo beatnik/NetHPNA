@@ -15,7 +15,7 @@ use Net::HP::NA::Device;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $ERROR %actions);
-	    $VERSION     = '0.01';
+	    $VERSION     = '0.03';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -69,14 +69,13 @@ sub users # No Moose here :(
      $self->{"Users"} = $args{"users"};
      if ($self->mock())
      { return $self->{"Users"}; }
-     #if ($args{"name"})
-     #{ $self->{"Users"} = $self->query("User","name",$args{"name"}); }
-     #if ($args{"id"})
-     #{ $self->{"Users"} = $self->query("User","id",$args{"id"}); }
+     if ($args{"userName"})
+     { $self->{"Users"} = $self->query("type" => "Net::HP::NA::User","userName" => $args{"userName"}); }
+     if ($args{"userID"})
+     { $self->{"Users"} = $self->query("type" => "Net::HP::NA::User","userID" => $args{"userID"}); }
    } else
    { my @fields = @Net::HP::NA::User::fields;
-     my %rows = % { $self->query("User") };
-	 print Dumper \%rows;
+     my %rows = % { $self->query("type" => "Net::HP::NA::User") };
 	 my %data = ();
      for my $row (keys %rows)
      { my %single = ();
@@ -104,7 +103,7 @@ sub devices # No Moose here :(
      #{ $self->{"Devices"} = $self->query("Device","id",$args{"id"}); }
      } else
    { my @fields = @Net::HP::NA::Device::fields;
-     my %rows = % { $self->query("Device") };
+     my %rows = % { $self->query("type" => "Net::HP::NA::Device") };
 	 my %data = ();
      for my $row (keys %rows)
      { my %single = ();
@@ -133,7 +132,8 @@ has 'password' => (
 # Non-Moose
 
 sub query 
-{ my ($self, $type, $method, $key, %params) = @_;
+{ my ($self) = shift @_;
+  my %params = @_;
   my $hostname = $self->hostname;
   if ($self->ssl)
   { $hostname = "https://$hostname"; } else
@@ -147,19 +147,58 @@ sub query
 
   $self->session($som->valueof('//Result/Text'));
   my %data = ();
-
-  if ($type eq "User")
-  { $type = "Generic";
-    $method = "list_user";
-	$key = "userName";
+  my $type = $params{"type"}; delete($params{"type"});
+  my $method = $params{"method"}; delete($params{"method"});
+  my $key = $params{"key"}; delete($params{"key"});
+  my $datatype = $params{"datatype"}; delete($params{"datatype"});
+  if ($type eq "Net::HP::NA::User") # Standard query 
+  { if (!$params{"userName"} && !$params{"userID"})
+    { $method = "list_user";
+	  $key = "userName";
+	  $datatype = $type;
+	  $type = "Generic";
+	}
+	if ($params{"userName"})
+	{ $key = "userName";
+	  $params{"u"} = $params{"userName"};
+	  delete($params{"userName"});
+	  $method = "show_user";
+	  $datatype = $type;
+	  $type = "Generic";
+	}
+	if ($params{"userID"})
+	{ $key = "userName";
+	  $params{"id"} = $params{"userID"};
+	  delete($params{"userID"});
+	  $method = "show_user";
+	  $datatype = $type;
+	  $type = "Generic";
+	}
   }
-
-  if ($type eq "Device")
-  { $type = "Generic";
-    $method = "list_device";
-	$key = "hostName";
+  
+  if ($type eq "Net::HP::NA::Device")
+  { if (!$params{"hostName"} && !$params{"hostID"})
+    { $method = "list_device";
+	  $key = "hostName";
+	  $datatype = $type;
+	  $type = "Generic";
+	} 
+	if ($params{"hostName"})
+	{ $key = "hostName";
+	  delete($params{"hostName"});
+	  $method = "show_device";
+	  $datatype = $type;
+	  $type = "Generic";
+	}
+	if ($params{"hostID"})
+	{ $key = "hostName";
+	  delete($params{"hostID"});
+	  $method = "show_device";
+	  $datatype = $type;
+	  $type = "Generic";
+	}
   }
-
+ 
   if ($type eq "Generic")
   { my @data = (SOAP::Data->name('sessionid')->value($self->session));
     for my $key (keys %params)
@@ -167,9 +206,16 @@ sub query
 	  push(@data, SOAP::Data->name($key)->value($value)); 
 	}
     my $som = $soap->call($method, @data);
+	warn Dumper $som;
     my $rows = $som->valueof('//Result/ResultSet');
     for my $row (@{$rows})
-    { $data{$row->{$key}} = $row; 
+    { if ($datatype =~ /^Net\:\:HP\:\:NA/)
+	  { no strict 'refs';
+	    $data{$row->{$key}} = ${datatype}->new(%{$row});
+		$data{$row->{$key}}->na($self);
+	  } else
+	  { $data{$row->{$key}} = $row;
+	  }
 	}
     my $status = $som->valueof('//Result/Status');
   }
@@ -199,6 +245,7 @@ sub create
 	  { my $value = $entry->meta->get_attribute($Net::HP::NA::User::createfields{$key})->get_value($entry);
 	    push(@data, SOAP::Data->name($key)->value($value)); 
 	  }
+	  $entry->na($self);
 	  $som = $soap->call('add_user', @data);
 	}
 	$ERROR = $som->faultstring if ($som->fault);
@@ -211,6 +258,7 @@ sub create
 	  { my $value = $entry->meta->get_attribute($Net::HP::NA::Device::updatefields{$key})->get_value($entry);
 	    push(@data, SOAP::Data->name($key)->value($value)); 
 	  }
+	  $entry->na($self);
 	  $som = $soap->call('add_device', @data);
 	}
 	$ERROR = $som->faultstring if ($som->fault);
@@ -240,6 +288,7 @@ sub update
 	  { my $value = $entry->meta->get_attribute($Net::HP::NA::User::updatefields{$key})->get_value($entry);
 	    push(@data, SOAP::Data->name($key)->value($value)); 
 	  }
+	  $entry->na($self);
 	  $som = $soap->call('mod_user', @data);
 	}
   }  
@@ -250,6 +299,7 @@ sub update
 	  { my $value = $entry->meta->get_attribute($Net::HP::NA::Device::updatefields{$key})->get_value($entry);
 	    push(@data, SOAP::Data->name($key)->value($value)); 
 	  }
+	  $entry->na($self);
 	  $som = $soap->call('mod_device', @data);
 	}
   }  
@@ -259,7 +309,6 @@ sub update
 sub delete 
 { my ($self, @entries) = @_;
   my $hostname = $self->hostname;
-  my $type;
   my $first = $entries[0];
 
   if ($self->ssl)
@@ -278,6 +327,7 @@ sub delete
            SOAP::Data->name('sessionid')->value($self->session),
            SOAP::Data->name('u')->value($entry->userName),
       );
+	  $entry->na($self);
     }
   }
   if (ref($first) eq "Net::HP::NA::Device")
@@ -286,11 +336,10 @@ sub delete
            SOAP::Data->name('sessionid')->value($self->session),
            SOAP::Data->name('u')->value($entry->hName),
       );
+	  $entry->na($self);
     }
   }
- 
   $ERROR = $som->faultstring if ($som->fault);
- 
 }
 
 =head1 NAME

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Access Cisco ACS functionality through REST API",
+   "abstract" : "Access HP Network Automation functionality through SOAP API",
    "author" : [
       "hendrik.vanbelleghem@gmail.com"
    ],
@@ -23,13 +23,13 @@
       }
    },
    "provides" : {
-      "Net::Cisco::ACS" : {
+      "Net::HP::NA" : {
          "file" : "lib/Net/HP/NA.pm",
-         "version" : "0.03"
+         "version" : "0.01"
       },
-      "Net::Cisco::ACS::User" : {
+      "Net::HP::NA::User" : {
          "file" : "lib/Net/HP/NA/User.pm",
-         "version" : "0.03"
+         "version" : "0.01"
       }
    },
    "release_status" : "stable",
@@ -38,6 +38,6 @@
          "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
       ]
    },
-   "version" : "0",
+   "version" : "0.01",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

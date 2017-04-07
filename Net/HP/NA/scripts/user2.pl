@@ -12,7 +12,7 @@ use Data::Dumper;
 
 my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
-"password" => 'Secret');
+"password" => 'password');
 my $user = Net::HP::NA::User->new();
 $user->userName("user4");
 $user->userPassword("Secret");
@@ -24,4 +24,4 @@ $user->emailAddress('Pink@fluffyunicorn.rainbow');
 $user->aaaUserName("user4");
 $na->create($user);
 print $Net::HP::NA::ERROR;
-$na->users;
+print Dumper $na->query("userName" => "user4", "type" => "Net::HP::NA::User");

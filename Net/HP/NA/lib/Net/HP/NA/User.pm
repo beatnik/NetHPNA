@@ -2,8 +2,6 @@ package Net::HP::NA::User;
 use strict;
 use Moose;
 
-# HP did a bad job at documenting these..
-
 # list_groups type = user
 #  '__m_users' => '',
 #  'userGroupCustom3' => '',
@@ -54,7 +52,7 @@ use Moose;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @fields %createfields %updatefields);
-    $VERSION     = '0.01';
+    $VERSION     = '0.03';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -295,8 +293,38 @@ has 'newUserName' => (
         is => 'rw',
         isa => 'Str',
         );
+
+has 'na' => (
+        is => 'rw',
+        isa => 'Net::HP::NA',
+        );
+
+sub delete
+{ my $self = shift;
+  if (ref($self->na) eq "Net::HP::NA") 
+  { $self->na->delete($self); }
+}
+
+sub update
+{ my $self = shift;
+  if (ref($self->na) eq "Net::HP::NA") 
+  { $self->na->update($self); }
+}
+
+sub create
+{ my $self = shift;
+  if (ref($self->na) eq "Net::HP::NA") 
+  { $self->na->update($self); }
+}
 		
 # No Moose	
+
+sub toCSV
+{ my $self = shift;
+  my $id = $self->Id;
+  #return $result;
+}
+
 
 =head1 NAME
 
