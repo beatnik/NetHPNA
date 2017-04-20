@@ -15,7 +15,7 @@ use Net::HP::NA::Device;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $ERROR %actions);
-	    $VERSION     = '0.03';
+	    $VERSION     = '0.01';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -203,10 +203,11 @@ sub query
   { my @data = (SOAP::Data->name('sessionid')->value($self->session));
     for my $key (keys %params)
 	{ my $value = $params{$key};
+	  $key =~ s/^_//; # To allow key collision.. For instance with list_groups type = user
 	  push(@data, SOAP::Data->name($key)->value($value)); 
 	}
     my $som = $soap->call($method, @data);
-	warn Dumper $som;
+	$datatype ||= "";
     my $rows = $som->valueof('//Result/ResultSet');
     for my $row (@{$rows})
     { if ($datatype =~ /^Net\:\:HP\:\:NA/)
@@ -214,7 +215,7 @@ sub query
 	    $data{$row->{$key}} = ${datatype}->new(%{$row});
 		$data{$row->{$key}}->na($self);
 	  } else
-	  { $data{$row->{$key}} = $row;
+	  { $data{$row->{$key}} = $row if $row->{$key};
 	  }
 	}
     my $status = $som->valueof('//Result/Status');
