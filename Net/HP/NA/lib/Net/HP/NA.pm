@@ -29,7 +29,7 @@ BEGIN {
 has 'ssl_options' => (
 	is => 'rw',
 	isa => 'HashRef',
-	default => sub { { 'SSL_verify_mode' => "SSL_VERIFY_NONE", 'verify_hostname' => '0' } }
+	#default => sub { { 'SSL_verify_mode' => "SSL_VERIFY_NONE", 'verify_hostname' => '0' } }
 	);
 
 has 'ssl' => (
@@ -138,7 +138,9 @@ sub query
   if ($self->ssl)
   { $hostname = "https://$hostname"; } else
   { $hostname = "http://$hostname"; }
+  my %ssl_opts = %{ $self->ssl_options};
   my $soap = SOAP::Lite->new( proxy => "$hostname/soap");
+  $soap->transport->ssl_opts( %ssl_opts ) if %ssl_opts;
   $soap->default_ns($self->default_ns);
   my $som = $soap->call('login',
    SOAP::Data->name('username')->value($self->username),
