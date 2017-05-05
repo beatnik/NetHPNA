@@ -14,5 +14,5 @@ my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
 "password" => 'password');
 
-my $user_ref = $na->users("userName" => "user_to_be_deleted");
-$na->delete($user_ref->{"user_to_be_deleted"});
+my $user_ref = $na->users("userName" => "user4");
+$na->delete($user_ref);

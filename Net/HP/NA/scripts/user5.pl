@@ -13,8 +13,5 @@ use Data::Dumper;
 my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
 "password" => 'password');
-my $user_ref = $na->query("type" => "Generic", "method" => "show_user_group", "key" => "userName", "userName" => "foo_user");
-print Dumper $user_ref;
-#print Dumper $na->query('Generic','show_user_group','userName','name','Full Access User');
-#print Dumper $na->query('Generic','list_groups','name','type','user');
+print Dumper $na->query("type" => "Generic", "method" => "list_groups", "key" => "userGroupName", "_type" => "user");
 print $Net::HP::NA::ERROR;

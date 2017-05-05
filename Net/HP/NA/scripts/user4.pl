@@ -14,16 +14,16 @@ my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
 "password" => 'password');
 my $user = Net::HP::NA::User->new();
-$user->userName("foo_user");
+$user->userName("user3");
 $user->userPassword("Secret");
 $user->allowFailover("true");
 $user->lastName("Changed Last Name");
 $user->firstName("Changed First Name");
 $user->useAaaLoginForProxy("false");
-$user->emailAddress('foo@bar.bar');
-$user->aaaUserName("falkm_auto");
+$user->emailAddress('user@domain.com');
+$user->aaaUserName("user4");
 $na->update($user);
-my $user_ref = $na->query("userName" => "foo_user", "type" => "Net::HP::NA::User");
+my $user_ref = $na->query("userName" => "falkm_auto", "type" => "Net::HP::NA::User");
 print Dumper $user_ref;
 # Alternatively: 
 # This will only work if you trigger a query or explicitly call $user->na($na);

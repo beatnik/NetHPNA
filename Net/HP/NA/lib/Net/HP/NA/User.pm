@@ -319,13 +319,6 @@ sub create
 		
 # No Moose	
 
-sub toCSV
-{ my $self = shift;
-  my $id = $self->Id;
-  #return $result;
-}
-
-
 =head1 NAME
 
 Net::HP::NA::User - Access HP Network Automation functionality through SOAP API - User fields

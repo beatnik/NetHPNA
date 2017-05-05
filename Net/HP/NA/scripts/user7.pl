@@ -14,9 +14,7 @@ my $na = Net::HP::NA->new("hostname" => "127.0.0.1",
 "username" => 'admin',
 "password" => 'password');
 
-# HP is quite inconsistent with their parameter names.. Here they use 'u' and 'g'?!?
-
-$na->query("type" => "Generic", "method" => "del_user_from_group", "g" => "Full Access User", "u" => "to_be_deleted_user");
+$na->query("type" => "Generic", "method" => "del_user_from_group", "g" => "Full Access User", "u" => "user4");
 my $row = $na->query("type" => "Generic", "method" => "show_user_group","key" => "userGroupName" ,"name" => "Full Access User");
 my $userid = $row->{"Full Access User"}->{"__m_users"};
 print $userid;
